@@ -4,7 +4,7 @@
     "slug": "entangle-mobile",
     "version": "0.0.2",
     "owner": "baltsatk",
-    "orientation": "portrait",
+    "orientation": "default",
     "scheme": "baltsat-entangle",
     "userInterfaceStyle": "automatic",
     "ios": {
