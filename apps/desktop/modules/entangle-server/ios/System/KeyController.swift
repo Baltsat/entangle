@@ -18,6 +18,10 @@ final class KeyController {
 
   func pressKey(code: KeyCodeName, phase: KeyPhase, mods: UInt32) {
     queue.async {
+      if code == .fn {
+        self.pressFn(phase: phase)
+        return
+      }
       let flags = Self.flagsForMask(mods)
       guard let virtualKey = Self.virtualKey(for: code) else { return }
       switch phase {
@@ -73,6 +77,18 @@ final class KeyController {
     }
     event.flags = combinedFlags
     event.post(tap: .cghidEventTap)
+  }
+
+  private func pressFn(phase: KeyPhase) {
+    switch phase {
+    case .down:
+      postModifier(0x3F, keyDown: true, flags: [.maskSecondaryFn])
+    case .up:
+      postModifier(0x3F, keyDown: false, flags: [])
+    case .tap:
+      postModifier(0x3F, keyDown: true, flags: [.maskSecondaryFn])
+      postModifier(0x3F, keyDown: false, flags: [])
+    }
   }
 
   /// Posts a modifier-key transition (Control, Shift, etc.). The event must
@@ -140,7 +156,8 @@ final class KeyController {
     .pageDown: 0x79,
     .f1: 0x7A, .f2: 0x78, .f3: 0x63, .f4: 0x76,
     .f5: 0x60, .f6: 0x61, .f7: 0x62, .f8: 0x64,
-    .f9: 0x65, .f10: 0x6D, .f11: 0x67, .f12: 0x6F
+    .f9: 0x65, .f10: 0x6D, .f11: 0x67, .f12: 0x6F,
+    .fn: 0x3F
   ]
 
   private static func virtualKey(for code: KeyCodeName) -> CGKeyCode? {
@@ -166,6 +183,7 @@ enum KeyCodeName: String {
   case f1 = "F1", f2 = "F2", f3 = "F3", f4 = "F4"
   case f5 = "F5", f6 = "F6", f7 = "F7", f8 = "F8"
   case f9 = "F9", f10 = "F10", f11 = "F11", f12 = "F12"
+  case fn = "Fn"
 }
 
 enum KeyPhase: String {
