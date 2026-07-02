@@ -1,30 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {Animated, Pressable, StyleSheet, Text, View} from 'react-native';
 
-import { useServerStore } from '../server-state';
-import { fonts, tokens } from '../theme';
-import { QRCode } from './atoms/QRCode';
+import {useServerStore} from '../server-state';
+import {fonts, tokens} from '../theme';
+import {QRCode} from './atoms/QRCode';
 
 type Props = {
   visible: boolean;
   onClose: () => void;
 };
 
-const PAIR_LINK_BASE = 'https://entangle.donadel.dev/pair';
+const PAIR_LINK_BASE = 'baltsat-entangle://pair';
 
-export function PairingSheet({ visible, onClose }: Props) {
-  const pairing = useServerStore((s) => s.pairing);
-  const port = useServerStore((s) => s.port);
-  const lanHost = useServerStore((s) => s.lanHost);
-  const clientCount = useServerStore((s) => Object.keys(s.clients).length);
-  const startPairing = useServerStore((s) => s.startPairing);
-  const stopPairing = useServerStore((s) => s.stopPairing);
+export function PairingSheet({visible, onClose}: Props) {
+  const pairing = useServerStore(s => s.pairing);
+  const port = useServerStore(s => s.port);
+  const lanHost = useServerStore(s => s.lanHost);
+  const clientCount = useServerStore(s => Object.keys(s.clients).length);
+  const startPairing = useServerStore(s => s.startPairing);
+  const stopPairing = useServerStore(s => s.stopPairing);
 
   const baselineCountRef = useRef<number | null>(null);
 
@@ -56,9 +50,6 @@ export function PairingSheet({ visible, onClose }: Props) {
 
   if (!visible) return null;
 
-  // Universal link: opens the iPhone app via associatedDomains when
-  // installed, otherwise lands on the website's /pair page (App Store
-  // CTA + manual `entangle://` fallback button).
   const qrPayload = pairing
     ? `${PAIR_LINK_BASE}?` +
       [
@@ -85,13 +76,18 @@ export function PairingSheet({ visible, onClose }: Props) {
           </View>
           <View style={styles.copyColumn}>
             <Text style={styles.eyebrow}>Pair a new phone</Text>
-            <Text style={styles.heading}>Scan this code with the{'\n'}Entangle iPhone app.</Text>
+            <Text style={styles.heading}>
+              Scan this code with the{'\n'}Entangle iPhone app.
+            </Text>
             <Text style={styles.lede}>
-              One-time code. Both devices stay on this network. Nothing leaves your Wi-Fi.
+              One-time code. Both devices stay on this network. Nothing leaves
+              your Wi-Fi.
             </Text>
             <View style={styles.codeBox}>
               <Text style={styles.codeLabel}>or enter code</Text>
-              <Text style={styles.codeValue}>{pairing?.code ?? '— · — · —'}</Text>
+              <Text style={styles.codeValue}>
+                {pairing?.code ?? '— · — · —'}
+              </Text>
             </View>
             <Listening port={port} />
             <View style={styles.actions}>
@@ -113,7 +109,7 @@ export function PairingSheet({ visible, onClose }: Props) {
   );
 }
 
-function ExpiresPill({ expiresAt }: { expiresAt: number | null }) {
+function ExpiresPill({expiresAt}: {expiresAt: number | null}) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
@@ -132,14 +128,22 @@ function ExpiresPill({ expiresAt }: { expiresAt: number | null }) {
   );
 }
 
-function Listening({ port }: { port: number | null }) {
+function Listening({port}: {port: number | null}) {
   const opacity = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.4, duration: 700, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
-      ])
+        Animated.timing(opacity, {
+          toValue: 0.4,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      ]),
     );
     loop.start();
     return () => loop.stop();
@@ -147,10 +151,7 @@ function Listening({ port }: { port: number | null }) {
   return (
     <View style={styles.listening}>
       <Animated.View
-        style={[
-          styles.listeningDot,
-          { opacity, shadowColor: tokens.accent },
-        ]}
+        style={[styles.listeningDot, {opacity, shadowColor: tokens.accent}]}
       />
       <Text style={styles.listeningText}>
         Listening for new device on port{' '}
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
     backgroundColor: tokens.accent,
     shadowOpacity: 1,
     shadowRadius: 4,
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: {width: 0, height: 0},
   },
   listeningText: {
     fontSize: 12.5,

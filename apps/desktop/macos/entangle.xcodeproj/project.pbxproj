@@ -370,7 +370,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = KN3BH83GQ4;
+				DEVELOPMENT_TEAM = 3BGK34ZGS6;
 				INFOPLIST_FILE = "entangle-macos/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Entangle;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -385,7 +385,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.gabrieldonadel.entangle;
+				PRODUCT_BUNDLE_IDENTIFIER = com.baltsat.entangle;
 				PRODUCT_NAME = entangle;
 				SDKROOT = macosx;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
@@ -403,7 +403,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3VRHBFMBRL;
+				DEVELOPMENT_TEAM = 3BGK34ZGS6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "entangle-macos/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Entangle;
@@ -420,7 +420,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.gabrieldonadel.entangle;
+				PRODUCT_BUNDLE_IDENTIFIER = com.baltsat.entangle;
 				PRODUCT_NAME = entangle;
 				SDKROOT = macosx;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;

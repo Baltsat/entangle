@@ -28,7 +28,7 @@ import {
 import { LessonScreen } from "@/features/onboarding/lesson";
 import { useOnboarding } from "@/state/onboarding";
 
-const DOWNLOAD_URL = "https://entangle.donadel.dev";
+const DOWNLOAD_URL = "https://github.com/Baltsat/entangle";
 
 type Step = "welcome" | "install" | "basics" | "scroll" | "power";
 const ORDER: Step[] = ["welcome", "install", "basics", "scroll", "power"];
@@ -327,7 +327,7 @@ function InstallMac({
   onSkip: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const url = "entangle.donadel.dev";
+  const url = "github.com/Baltsat/entangle";
 
   const copy = () => {
     setCopied(true);

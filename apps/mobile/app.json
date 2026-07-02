@@ -3,43 +3,29 @@
     "name": "entangle",
     "slug": "entangle-mobile",
     "version": "0.0.2",
+    "owner": "baltsatk",
     "orientation": "portrait",
-    "scheme": "entangle",
+    "scheme": "baltsat-entangle",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/AppIcon.icon",
       "infoPlist": {
         "NSLocalNetworkUsageDescription": "Entangle needs local-network access to discover your Mac and send pointer events.",
-        "NSBonjourServices": ["_entangle._tcp.", "_entangle._tcp."],
+        "NSBonjourServices": ["_entangle._tcp."],
         "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.gabrieldonadel.entangle-mobile",
-      "appleTeamId": "3VRHBFMBRL",
-      "associatedDomains": ["applinks:entangle.donadel.dev"]
+      "bundleIdentifier": "com.baltsat.entangle.mobile",
+      "appleTeamId": "3BGK34ZGS6"
     },
     "android": {
       "icon": "./assets/images/icon.png",
-      "package": "com.gabrieldonadel.entangle",
+      "package": "com.baltsat.entangle",
       "permissions": [
         "android.permission.CHANGE_WIFI_MULTICAST_STATE",
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.ACCESS_WIFI_STATE"
       ],
-      "predictiveBackGestureEnabled": false,
-      "intentFilters": [
-        {
-          "action": "VIEW",
-          "autoVerify": true,
-          "data": [
-            {
-              "scheme": "https",
-              "host": "entangle.donadel.dev",
-              "pathPrefix": "/pair"
-            }
-          ],
-          "category": ["BROWSABLE", "DEFAULT"]
-        }
-      ]
+      "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
@@ -80,14 +66,11 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "220d921b-e531-4064-8453-3be26e897841"
+        "projectId": "05ea16b6-438e-48a9-899e-c872118f1f63"
       }
     },
     "runtimeVersion": {
       "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/220d921b-e531-4064-8453-3be26e897841"
     }
   }
 }

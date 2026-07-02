@@ -22,6 +22,14 @@
         "buildType": "apk"
       }
     },
+    "preview-local": {
+      "distribution": "internal",
+      "channel": "preview",
+      "credentialsSource": "local",
+      "android": {
+        "buildType": "apk"
+      }
+    },
     "production-apk": {
       "channel": "production",
       "android": {
@@ -39,9 +47,7 @@
   },
   "submit": {
     "production": {
-      "ios": {
-        "ascAppId": "6764150476"
-      }
+      "ios": {}
     }
   }
 }
