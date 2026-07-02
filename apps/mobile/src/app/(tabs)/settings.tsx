@@ -1,18 +1,39 @@
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useShallow } from 'zustand/react/shallow';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useShallow } from "zustand/react/shallow";
 
-import { PROTOCOL_VERSION } from '@entangle/protocol';
+import { PROTOCOL_VERSION } from "@entangle/protocol";
 
-import { C } from '@/features/onboarding/atoms';
-import { useConnection } from '@/state/connection';
-import { useSettings } from '@/state/settings';
+import { C } from "@/features/onboarding/atoms";
+import { useConnection } from "@/state/connection";
+import { useSettings } from "@/state/settings";
+import type { VolumeShortcutAction } from "@/state/settings";
 
 const SENSITIVITY_PRESETS = [
-  { label: 'Slow', value: 1.0 },
-  { label: 'Normal', value: 1.5 },
-  { label: 'Fast', value: 2.5 },
+  { label: "Slow", value: 1.0 },
+  { label: "Normal", value: 1.5 },
+  { label: "Fast", value: 2.5 },
 ] as const;
+
+const VOLUME_ACTIONS: { label: string; value: VolumeShortcutAction }[] = [
+  { label: "Off", value: "off" },
+  { label: "Fn", value: "Fn" },
+  { label: "Return", value: "Return" },
+  { label: "Esc", value: "Escape" },
+  { label: "Tab", value: "Tab" },
+  { label: "Space", value: "Space" },
+  { label: "⌫", value: "Backspace" },
+  { label: "Del", value: "Delete" },
+  { label: "↑", value: "ArrowUp" },
+  { label: "↓", value: "ArrowDown" },
+];
 
 export default function SettingsScreen() {
   const phase = useConnection((s) => s.phase);
@@ -26,21 +47,33 @@ export default function SettingsScreen() {
   const setPointerSensitivity = useSettings((s) => s.setPointerSensitivity);
   const naturalScroll = useSettings((s) => s.naturalScroll);
   const setNaturalScroll = useSettings((s) => s.setNaturalScroll);
+  const volumeDownAction = useSettings((s) => s.volumeDownAction);
+  const setVolumeDownAction = useSettings((s) => s.setVolumeDownAction);
+  const volumeUpAction = useSettings((s) => s.volumeUpAction);
+  const setVolumeUpAction = useSettings((s) => s.setVolumeUpAction);
+  const volumeHaptics = useSettings((s) => s.volumeHaptics);
+  const setVolumeHaptics = useSettings((s) => s.setVolumeHaptics);
 
   return (
-    <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.root} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
           <Text style={styles.title}>Connection</Text>
           <Row label="Status" value={phase} />
-          <Row label="Server" value={serverName ?? '—'} />
-          <Row label="Host" value={target ? `${target.host}:${target.port}` : '—'} />
-          <Row label="Latency" value={latency != null ? `${latency} ms` : '—'} />
-          <Row label="Server version" value={serverVersion ?? '—'} />
+          <Row label="Server" value={serverName ?? "—"} />
+          <Row
+            label="Host"
+            value={target ? `${target.host}:${target.port}` : "—"}
+          />
+          <Row
+            label="Latency"
+            value={latency != null ? `${latency} ms` : "—"}
+          />
+          <Row label="Server version" value={serverVersion ?? "—"} />
           <Row label="Protocol" value={`v${PROTOCOL_VERSION}`} />
           <Row
             label="Capabilities"
-            value={serverCaps.length ? serverCaps.join(', ') : '—'}
+            value={serverCaps.length ? serverCaps.join(", ") : "—"}
           />
         </View>
 
@@ -48,16 +81,25 @@ export default function SettingsScreen() {
           <Text style={styles.title}>Pointer sensitivity</Text>
           <View style={styles.presets}>
             {SENSITIVITY_PRESETS.map((preset) => {
-              const selected = Math.abs(pointerSensitivity - preset.value) < 0.01;
+              const selected =
+                Math.abs(pointerSensitivity - preset.value) < 0.01;
               return (
                 <Pressable
                   key={preset.label}
                   style={[styles.preset, selected && styles.presetSelected]}
-                  onPress={() => setPointerSensitivity(preset.value)}>
-                  <Text style={[styles.presetText, selected && styles.presetTextSelected]}>
+                  onPress={() => setPointerSensitivity(preset.value)}
+                >
+                  <Text
+                    style={[
+                      styles.presetText,
+                      selected && styles.presetTextSelected,
+                    ]}
+                  >
                     {preset.label}
                   </Text>
-                  <Text style={styles.presetValue}>{preset.value.toFixed(1)}×</Text>
+                  <Text style={styles.presetValue}>
+                    {preset.value.toFixed(1)}×
+                  </Text>
                 </Pressable>
               );
             })}
@@ -69,7 +111,8 @@ export default function SettingsScreen() {
             <View style={styles.toggleLabels}>
               <Text style={styles.toggleTitle}>Natural scroll</Text>
               <Text style={styles.toggleSubtitle}>
-                Content follows fingers. Turn off if scroll feels inverted on your Mac.
+                Content follows fingers. Turn off if scroll feels inverted on
+                your Mac.
               </Text>
             </View>
             <Switch value={naturalScroll} onValueChange={setNaturalScroll} />
@@ -77,15 +120,50 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.card}>
+          <Text style={styles.title}>Physical buttons</Text>
+          <Text style={styles.hint}>
+            Volume shortcuts work while Entangle is open and connected.
+          </Text>
+          <ActionPicker
+            label="Volume down"
+            value={volumeDownAction}
+            onChange={setVolumeDownAction}
+          />
+          <ActionPicker
+            label="Volume up"
+            value={volumeUpAction}
+            onChange={setVolumeUpAction}
+          />
+          <View style={[styles.toggleRow, styles.hapticsRow]}>
+            <View style={styles.toggleLabels}>
+              <Text style={styles.toggleTitle}>Haptic feedback</Text>
+              <Text style={styles.toggleSubtitle}>
+                Confirm hardware-button shortcuts with a light tap.
+              </Text>
+            </View>
+            <Switch value={volumeHaptics} onValueChange={setVolumeHaptics} />
+          </View>
+        </View>
+
+        <View style={styles.card}>
           <Text style={styles.title}>Spaces &amp; Mission Control</Text>
           <Text style={styles.hint}>
-            Use the buttons at the bottom of the Dock tab to switch Spaces or open Mission
-            Control. They send the default macOS keyboard shortcuts below, so make sure they
-            are enabled in System Settings → Keyboard → Keyboard Shortcuts → Mission Control.
+            Use the buttons at the bottom of the Dock tab to switch Spaces or
+            open Mission Control. They send the default macOS keyboard shortcuts
+            below, so make sure they are enabled in System Settings → Keyboard →
+            Keyboard Shortcuts → Mission Control.
           </Text>
-          <ShortcutRow gesture="Prev Space" shortcut="⌃←" action="Previous Space" />
+          <ShortcutRow
+            gesture="Prev Space"
+            shortcut="⌃←"
+            action="Previous Space"
+          />
           <ShortcutRow gesture="Next Space" shortcut="⌃→" action="Next Space" />
-          <ShortcutRow gesture="Mission" shortcut="⌃↑" action="Mission Control" />
+          <ShortcutRow
+            gesture="Mission"
+            shortcut="⌃↑"
+            action="Mission Control"
+          />
         </View>
 
         <Pressable style={styles.disconnect} onPress={disconnect}>
@@ -103,6 +181,43 @@ function Row({ label, value }: { label: string; value: string }) {
       <Text style={styles.value} numberOfLines={1}>
         {value}
       </Text>
+    </View>
+  );
+}
+
+function ActionPicker({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: VolumeShortcutAction;
+  onChange: (value: VolumeShortcutAction) => void;
+}) {
+  return (
+    <View style={styles.actionPicker}>
+      <Text style={styles.actionLabel}>{label}</Text>
+      <View style={styles.actionGrid}>
+        {VOLUME_ACTIONS.map((action) => {
+          const selected = action.value === value;
+          return (
+            <Pressable
+              key={`${label}-${action.value}`}
+              style={[styles.actionChip, selected && styles.actionChipSelected]}
+              onPress={() => onChange(action.value)}
+            >
+              <Text
+                style={[
+                  styles.actionChipText,
+                  selected && styles.actionChipTextSelected,
+                ]}
+              >
+                {action.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -129,85 +244,126 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.bg },
   content: { padding: 16, paddingBottom: 32 },
   card: {
-    backgroundColor: '#1c1c1e',
+    backgroundColor: "#1c1c1e",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
   },
-  title: { color: '#fff', fontSize: 18, fontWeight: '600', marginBottom: 8 },
+  title: { color: "#fff", fontSize: 18, fontWeight: "600", marginBottom: 8 },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 6,
     gap: 12,
   },
-  label: { color: '#8e8e93' },
-  value: { color: '#fff', fontVariant: ['tabular-nums'], flexShrink: 1, textAlign: 'right' },
-  hint: { color: '#8e8e93', fontSize: 13, lineHeight: 18, marginBottom: 8 },
-  hintSmall: { color: '#6b6b70', fontSize: 12, lineHeight: 16, marginTop: 6 },
+  label: { color: "#8e8e93" },
+  value: {
+    color: "#fff",
+    fontVariant: ["tabular-nums"],
+    flexShrink: 1,
+    textAlign: "right",
+  },
+  hint: { color: "#8e8e93", fontSize: 13, lineHeight: 18, marginBottom: 8 },
+  hintSmall: { color: "#6b6b70", fontSize: 12, lineHeight: 16, marginTop: 6 },
   presets: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   preset: {
     flex: 1,
     padding: 12,
     borderRadius: 8,
-    backgroundColor: '#2c2c2e',
-    alignItems: 'center',
+    backgroundColor: "#2c2c2e",
+    alignItems: "center",
   },
-  presetSelected: { backgroundColor: '#0a84ff' },
-  presetText: { color: '#d1d1d6', fontSize: 14, fontWeight: '600' },
-  presetTextSelected: { color: '#fff' },
+  presetSelected: { backgroundColor: "#0a84ff" },
+  presetText: { color: "#d1d1d6", fontSize: 14, fontWeight: "600" },
+  presetTextSelected: { color: "#fff" },
   presetValue: {
-    color: '#8e8e93',
+    color: "#8e8e93",
     fontSize: 11,
     marginTop: 2,
-    fontVariant: ['tabular-nums'],
+    fontVariant: ["tabular-nums"],
   },
   toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 16,
   },
   toggleLabels: { flex: 1 },
-  toggleTitle: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  toggleTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
   toggleSubtitle: {
-    color: '#8e8e93',
+    color: "#8e8e93",
     fontSize: 12,
     marginTop: 4,
     lineHeight: 16,
   },
+  actionPicker: {
+    paddingTop: 8,
+  },
+  actionLabel: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  actionGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  actionChip: {
+    minWidth: 64,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 8,
+    backgroundColor: "#2c2c2e",
+    alignItems: "center",
+  },
+  actionChipSelected: {
+    backgroundColor: "#0a84ff",
+  },
+  actionChipText: {
+    color: "#d1d1d6",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  actionChipTextSelected: {
+    color: "#fff",
+  },
+  hapticsRow: {
+    marginTop: 14,
+  },
   shortcutRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 6,
     gap: 12,
   },
   shortcutGesture: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 13,
     flex: 1,
   },
   shortcutKey: {
-    color: '#0a84ff',
+    color: "#0a84ff",
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     minWidth: 36,
-    textAlign: 'center',
+    textAlign: "center",
   },
   shortcutAction: {
-    color: '#8e8e93',
+    color: "#8e8e93",
     fontSize: 13,
     flex: 1,
-    textAlign: 'right',
+    textAlign: "right",
   },
   disconnect: {
     marginTop: 4,
     padding: 14,
-    backgroundColor: '#1c1c1e',
+    backgroundColor: "#1c1c1e",
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  disconnectText: { color: '#ff453a', fontSize: 15, fontWeight: '600' },
+  disconnectText: { color: "#ff453a", fontSize: 15, fontWeight: "600" },
 });

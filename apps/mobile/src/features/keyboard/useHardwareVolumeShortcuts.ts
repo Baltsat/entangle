@@ -4,9 +4,10 @@ import { AppState, Platform } from "react-native";
 import { VolumeManager } from "react-native-volume-manager";
 
 import { PROTOCOL_VERSION } from "@entangle/protocol";
-import type { KeyCode } from "@entangle/protocol";
 
 import { sendMessage } from "@/net/send";
+import { useSettings } from "@/state/settings";
+import type { VolumeShortcutAction } from "@/state/settings";
 
 const CENTER_VOLUME = 0.5;
 const MIN_DELTA = 0.015;
@@ -16,9 +17,18 @@ export function useHardwareVolumeShortcuts(enabled: boolean) {
   const resettingUntilRef = useRef(0);
   const lastVolumeRef = useRef<number | null>(null);
   const activeRef = useRef(AppState.currentState === "active");
+  const volumeDownAction = useSettings((s) => s.volumeDownAction);
+  const volumeUpAction = useSettings((s) => s.volumeUpAction);
+  const volumeHaptics = useSettings((s) => s.volumeHaptics);
 
   useEffect(() => {
-    if (Platform.OS !== "ios" || !enabled) return;
+    if (
+      Platform.OS !== "ios" ||
+      !enabled ||
+      (volumeDownAction === "off" && volumeUpAction === "off")
+    ) {
+      return;
+    }
 
     let mounted = true;
     let listener: { remove: () => void } | null = null;
@@ -33,15 +43,18 @@ export function useHardwareVolumeShortcuts(enabled: boolean) {
       centerVolume().catch(() => undefined);
     };
 
-    const sendKeyTap = (code: KeyCode) => {
+    const sendAction = (action: VolumeShortcutAction) => {
+      if (action === "off") return;
       sendMessage({
         v: PROTOCOL_VERSION,
         t: "k.key",
-        code,
+        code: action,
         phase: "tap",
         mods: 0,
       });
-      void Haptics.selectionAsync();
+      if (volumeHaptics) {
+        void Haptics.selectionAsync();
+      }
     };
 
     const start = async () => {
@@ -73,7 +86,7 @@ export function useHardwareVolumeShortcuts(enabled: boolean) {
           return;
         }
 
-        sendKeyTap(nextVolume < lastVolume ? "Fn" : "Return");
+        sendAction(nextVolume < lastVolume ? volumeDownAction : volumeUpAction);
         void centerVolume();
       });
     };
@@ -100,5 +113,5 @@ export function useHardwareVolumeShortcuts(enabled: boolean) {
         void VolumeManager.enable(false, true);
       } catch {}
     };
-  }, [enabled]);
+  }, [enabled, volumeDownAction, volumeHaptics, volumeUpAction]);
 }
