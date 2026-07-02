@@ -4,6 +4,7 @@ import { AppState, Platform } from "react-native";
 import { VolumeManager } from "react-native-volume-manager";
 
 import { PROTOCOL_VERSION } from "@entangle/protocol";
+import type { KeyCode } from "@entangle/protocol";
 
 import { sendMessage } from "@/net/send";
 
@@ -11,7 +12,7 @@ const CENTER_VOLUME = 0.5;
 const MIN_DELTA = 0.015;
 const RESET_WINDOW_MS = 280;
 
-export function useHardwareVolumeFnKey(enabled: boolean) {
+export function useHardwareVolumeShortcuts(enabled: boolean) {
   const resettingUntilRef = useRef(0);
   const lastVolumeRef = useRef<number | null>(null);
   const activeRef = useRef(AppState.currentState === "active");
@@ -32,11 +33,11 @@ export function useHardwareVolumeFnKey(enabled: boolean) {
       centerVolume().catch(() => undefined);
     };
 
-    const sendFnTap = () => {
+    const sendKeyTap = (code: KeyCode) => {
       sendMessage({
         v: PROTOCOL_VERSION,
         t: "k.key",
-        code: "Fn",
+        code,
         phase: "tap",
         mods: 0,
       });
@@ -72,7 +73,7 @@ export function useHardwareVolumeFnKey(enabled: boolean) {
           return;
         }
 
-        sendFnTap();
+        sendKeyTap(nextVolume < lastVolume ? "Fn" : "Return");
         void centerVolume();
       });
     };
