@@ -18,6 +18,7 @@ import { PracticeBanner } from "@/features/demo/PracticeBanner";
 import { HiddenInput } from "@/features/keyboard/HiddenInput";
 import { ModifierBar } from "@/features/keyboard/ModifierBar";
 import { SpecialKeys } from "@/features/keyboard/SpecialKeys";
+import { useHardwareVolumeFnKey } from "@/features/keyboard/useHardwareVolumeFnKey";
 import { TrackpadSurface } from "@/features/trackpad/TrackpadSurface";
 import type { LocalGestureEvent } from "@/features/trackpad/TrackpadSurface";
 import { useConnection } from "@/state/connection";
@@ -37,6 +38,7 @@ export default function TrackpadScreen() {
 
   const inputRef = useRef<TextInput>(null);
   const [focused, setFocused] = useState(false);
+  useHardwareVolumeFnKey(Platform.OS === "ios" && !demo && phase === "open");
 
   const [macSize, setMacSize] = useState<{ width: number; height: number }>({
     width: 0,
