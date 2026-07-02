@@ -49,6 +49,9 @@ target 'entangle-macOS' do
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings["SWIFT_ENABLE_EXPLICIT_MODULES"] = "NO"
+        if target.name == "fmt"
+          config.build_settings["CLANG_CXX_LANGUAGE_STANDARD"] = "c++17"
+        end
       end
     end
   end
